@@ -53,6 +53,12 @@ export const UserRegisterController = async (req, res) => {
         }
     });
 
+    await prisma.cart.create({
+        data: {
+            userId: newUser.id
+        }
+    });
+
     res.cookie("access_token", accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
