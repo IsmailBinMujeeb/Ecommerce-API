@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -40,6 +39,10 @@ model User {
   username      String   @unique
   email         String   @unique
   display_name  String
+  password      String
+  email_verification_token String?
+  email_verification_token_expiry DateTime?
+  is_email_verified Boolean @default(false)
   refresh_token String?  @default("")
   cart          Cart?
   reviews       Review[]
@@ -124,16 +127,16 @@ model Order {
 }
 
 model OrderItem {
-  id           Int      @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   orderId      Int
   productId    Int
-  quantity     Int      @default(1)
-  price        Decimal  @db.Decimal(10, 2)
-  product      Product  @relation(fields: [productId], references: [id])
-  order        Order    @relation(fields: [orderId], references: [id])
+  quantity     Int       @default(1)
+  price        Decimal   @db.Decimal(10, 2)
+  product      Product   @relation(fields: [productId], references: [id])
+  order        Order     @relation(fields: [orderId], references: [id])
   delivered_at DateTime?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
 
   @@index([orderId])
   @@index([productId])
