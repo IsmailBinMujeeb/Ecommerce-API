@@ -34,22 +34,30 @@ enum PaymentStatus {
   FAILED
 }
 
+enum UserRole {
+  USER
+  ADMIN
+  MODE
+}
+
 model User {
-  id            Int      @id @default(autoincrement())
-  username      String   @unique
-  email         String   @unique
-  display_name  String
-  password      String
-  email_verification_token String?
+  id                              Int         @id @default(autoincrement())
+  username                        String      @unique
+  email                           String      @unique
+  display_name                    String
+  password                        String
+  role                            UserRole    @default(USER)
+  permissions                     Permission?
+  email_verification_token        String?
   email_verification_token_expiry DateTime?
-  is_email_verified Boolean @default(false)
-  refresh_token String?  @default("")
-  cart          Cart?
-  reviews       Review[]
-  orders        Order[]
-  address       Address?
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  is_email_verified               Boolean     @default(false)
+  refresh_token                   String?     @default("")
+  cart                            Cart?
+  reviews                         Review[]
+  orders                          Order[]
+  address                         Address?
+  created_at                      DateTime    @default(now())
+  updated_at                      DateTime    @updatedAt
 }
 
 model Address {
@@ -62,6 +70,33 @@ model Address {
   state   String
   postal  String
   country String
+}
+
+model Permission {
+  id          Int  @id @default(autoincrement())
+  moderatorId Int  @unique
+  moderator   User @relation(fields: [moderatorId], references: [id])
+
+  can_view_products        Boolean @default(true)
+  can_view_categories      Boolean @default(true)
+  can_view_payments        Boolean @default(false)
+  can_view_orders          Boolean @default(true)
+  can_view_user_info       Boolean @default(true)
+  can_view_review          Boolean @default(true)
+  can_view_admin_dashboard Boolean @default(true)
+
+  can_manage_personal_cart Boolean @default(false)
+  can_place_orders         Boolean @default(false)
+  can_write_reviews        Boolean @default(false)
+
+  can_moderate_reviews  Boolean @default(true)
+  can_moderate_products Boolean @default(true)
+
+  can_perform_crud_on_product  Boolean @default(false)
+  can_perform_crud_on_category Boolean @default(false)
+
+  can_ban_user     Boolean @default(false)
+  can_promote_user Boolean @default(false)
 }
 
 model Product {
@@ -99,7 +134,6 @@ model Cart {
 }
 
 model CartProduct {
-  id         Int      @id @default(autoincrement())
   cartId     Int
   productId  Int
   quantity   Int      @default(1)
@@ -108,6 +142,7 @@ model CartProduct {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
+  @@id([cartId, productId])
   @@index([cartId])
   @@index([productId])
 }
