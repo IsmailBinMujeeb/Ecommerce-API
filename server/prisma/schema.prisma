@@ -117,9 +117,10 @@ model Product {
 }
 
 model Category {
-  id       Int       @id @default(autoincrement())
-  name     String    @unique
-  products Product[]
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  isDeleted Boolean   @default(false)
+  products  Product[]
 }
 
 model Cart {
