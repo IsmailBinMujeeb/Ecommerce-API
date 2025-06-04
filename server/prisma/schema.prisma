@@ -105,6 +105,7 @@ model Product {
   product_description String?       @default("")
   product_price       Decimal       @db.Decimal(10, 2)
   product_offer       Decimal       @db.Decimal(10, 2)
+  product_stock       Int
   product_images      String?
   product_videos      String?
   categoryId          Int
