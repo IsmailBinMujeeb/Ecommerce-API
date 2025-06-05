@@ -113,6 +113,7 @@ model Product {
   cartItems           CartProduct[]
   reviews             Review[]
   orderItems          OrderItem[]
+  isDeleted           Boolean       @default(false)  
   created_at          DateTime      @default(now())
   updated_at          DateTime      @updatedAt
 }
