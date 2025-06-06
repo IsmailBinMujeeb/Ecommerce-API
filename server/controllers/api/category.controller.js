@@ -17,8 +17,6 @@ export const FetchCategory = async (req, res) => {
 
     const { id } = req.params;
 
-    if (!id || isNaN(id)) throw new ApiError(400, "invalid category id");
-
     const category = await prisma.category.findUnique({
         where: {
             AND: {
@@ -35,8 +33,6 @@ export const FetchCategory = async (req, res) => {
 export const CreateCategory = async (req, res) => {
 
     const { name } = req.body;
-
-    if (!name) throw new ApiError(400, "missing category name");
 
     const isCategoryExistWithSameName = await prisma.category.findFirst({
         where: {
@@ -63,10 +59,6 @@ export const UpdateCategory = async (req, res) => {
 
     const { id } = req.params;
     const { name } = req.body;
-
-    if (!id || isNaN(id)) throw new ApiError(400, "invalid category id");
-
-    if (!name) throw new ApiError(400, "category updated name missing");
 
     const isCategoryExist = await prisma.category.findFirst({
         where: {
@@ -104,8 +96,6 @@ export const UpdateCategory = async (req, res) => {
 export const DeleteCategory = async (req, res) => {
 
     const { id } = req.params;
-
-    if (!id || isNaN(id)) throw new ApiError(400, "invalid category id");
 
     const isCategoryExist = await prisma.category.findFirst({
         where: {

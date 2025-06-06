@@ -29,8 +29,6 @@ export const addCartController = async (req, res) => {
     const userId = req.user.id;
     const { productId, quantity = 1 } = req.body;
 
-    if (!productId) throw new ApiError(400, "missing product id")
-
     const cart = await prisma.cart.findUnique({
         where: {
             userId
@@ -66,8 +64,6 @@ export const addCartController = async (req, res) => {
 export const updateCartController = async (req, res) => {
 
     const { cartId, productId, quantity } = req.body;
-
-    if (!cartId || !productId || !quantity) throw new ApiError(400, "Missing cart or product id");
 
     const item = await prisma.cartProduct.update({
         where: {

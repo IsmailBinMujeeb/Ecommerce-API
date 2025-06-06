@@ -1,13 +1,15 @@
 import { Router } from "express";
 import authenticationMiddleware from "../../middlewares/authentication.middleware.js";
 import { addCartController, getUserCartContorller, removeProductFromCartController, updateCartController } from "../../controllers/api/cart.controller.js";
+import { addCartValidator, removeProductFromCartValidator, updateCartValidator } from "../../validators/cart.validator.js";
+import validatorMiddleware from "../../middlewares/validator.middleware.js";
 import AsyncHandler from "../../utils/AsyncHandler.utils.js";
 
 const router = Router();
 
 router.get("/", authenticationMiddleware, AsyncHandler(getUserCartContorller));
-router.post("/add", authenticationMiddleware, AsyncHandler(addCartController));
-router.put("/update", authenticationMiddleware, AsyncHandler(updateCartController));
-router.delete("/remove", authenticationMiddleware, AsyncHandler(removeProductFromCartController));
+router.post("/add", authenticationMiddleware, addCartValidator(), validatorMiddleware, AsyncHandler(addCartController));
+router.put("/update", authenticationMiddleware, updateCartValidator(), validatorMiddleware, AsyncHandler(updateCartController));
+router.delete("/remove", authenticationMiddleware, removeProductFromCartValidator(), validatorMiddleware, AsyncHandler(removeProductFromCartController));
 
 export default router;

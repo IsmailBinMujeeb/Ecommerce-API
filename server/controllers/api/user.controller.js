@@ -7,8 +7,6 @@ export const FetchAuthenticatedUserController = async (req, res) => {
 
     const id = req.user.id;
 
-    if (!id) throw new ApiError(401, "unauthorized request");
-
     const user = await prisma.user.findUnique({
         where: {
             id
@@ -39,8 +37,6 @@ export const FetchUserByIdController = async (req, res) => {
 
     const { id } = req.params;
 
-    if (!id || isNaN(id)) throw new ApiError(400, "invalid user id");
-
     const user = await prisma.user.findUnique({
         where: {
             id: Number(id)
@@ -60,11 +56,7 @@ export const BanUserController = async (req, res) => {
 export const PromoteUserToModeratorController = async (req, res) => {
 
     const { permissions } = req.body;
-    const { id } = req.params
-
-    console.log(id, permissions)
-
-    if (!id || isNaN(id) || typeof permissions !== "object") throw new ApiError(400, "invalid id or permissions");
+    const { id } = req.params;
 
     for (const [_, value] of Object.entries(permissions)) {
         if (typeof value !== "boolean") throw new ApiError(400, `invalid permission "${value}"`)
@@ -109,8 +101,6 @@ export const PromoteUserToModeratorController = async (req, res) => {
 export const DemoteModeratorToUser = async (req, res) => {
 
     const { id } = req.params;
-
-    if (!id || isNaN(id)) throw new ApiError(400, "invalid user id");
 
     const isUserExistOrAlreadyANormalUser = await prisma.user.findFirst({
         where: {

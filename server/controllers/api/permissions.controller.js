@@ -6,8 +6,6 @@ export const FetchModeratorPermissionsController = async (req, res) => {
 
     const { id } = req.params;
 
-    if (!id, isNaN(id)) throw new ApiError(400, "invalid moderator id");
-
     const permissions = await prisma.permission.findUnique({
         where: {
             moderatorId: Number(id),
@@ -23,8 +21,6 @@ export const UpdateModeratorPermissionsController = async (req, res) => {
 
     const { id } = req.params;
     const { permissions } = req.body;
-
-    if (!id || isNaN(id) || typeof permissions !== "object") throw new ApiError(400, "invalid id or permissions");
 
     for (const [_, value] of Object.entries(permissions)) {
         if (typeof value !== "boolean") throw new ApiError(400, `invalid permission "${value}"`)

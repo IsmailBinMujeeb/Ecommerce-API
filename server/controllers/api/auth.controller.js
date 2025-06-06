@@ -11,8 +11,6 @@ export const UserRegisterController = async (req, res) => {
 
     const { username, email, password, display_name } = req.body;
 
-    if (!username || !email || !password || !display_name) throw new ApiError(400, "missing credentials");
-
     const isUserExist = await prisma.user.findFirst({
         where: {
             OR: [
@@ -78,7 +76,6 @@ export const UserRegisterController = async (req, res) => {
 export const UserLoginController = async (req, res) => {
 
     const { email, username, password } = req.body;
-    if ((!email && !username) || !password) throw new ApiError(400, "missing credentials");
 
     const user = await prisma.user.findFirst({
         where: {
@@ -177,8 +174,6 @@ export const emailVerificationController = async (req, res) => {
 
     const unhashedToken = req.params.token;
 
-    if (!unhashedToken) throw new ApiError(400, "missing token");
-
     const hashedToken = crypto.createHash("sha256").update(unhashedToken).digest("hex");
 
     const user = await prisma.user.findFirst({
@@ -211,12 +206,10 @@ export const refreshAccessToken = async (req, res) => {
 
     const incomming_refresh_token = req.cookies?.refresh_token;
 
-    if (!incomming_refresh_token) throw new ApiError(401, "unautherized request");
-
     const decoded = jwt.verify(incomming_refresh_token, process.env.JWT_REFRESH_SECRET, (err, result) => {
-        
+
         if (err) throw new ApiError(401, "refresh token expired or used");
-        return result;     
+        return result;
     });
 
     const user = await prisma.user.findFirst({
@@ -263,8 +256,6 @@ export const saveUserAddressController = async (req, res) => {
 
     const { line1, line2, city, state, postal, country } = req.body;
     const userId = req.user.id;
-    
-    if (!line1 || !city || !state || !postal || !country) throw new ApiError(400, "Missing credentials");
 
     const newAddress = await prisma.address.create({
         data: {

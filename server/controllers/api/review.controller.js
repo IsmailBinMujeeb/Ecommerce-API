@@ -7,9 +7,6 @@ export const CreateReviewController = async (req, res) => {
     const user = req.user;
     const { productId, comment, rating } = req.body;
 
-    if (!productId || !rating) throw new ApiError(400, "Missing credentials");
-    if (isNaN(productId) || isNaN(rating) || rating > 5 || rating < 1) throw new ApiError(400, "Invalid credentials");
-
     const isProductExist = await prisma.product.findFirst({
         where: {
             AND: {
@@ -50,8 +47,6 @@ export const CreateReviewController = async (req, res) => {
 export const FetchAllReviewsForAProductController = async (req, res) => {
 
     const { id } = req.params;
-
-    if (!id || isNaN(id)) throw new ApiError(400, "invalid product id");
 
     const isProductExist = await prisma.product.findFirst({
         where: {

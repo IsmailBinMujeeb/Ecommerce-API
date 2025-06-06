@@ -25,8 +25,6 @@ export const FetchOrderController = async (req, res) => {
 
     const { id } = req.params;
 
-    if (!id || isNaN(id)) throw new ApiError(400, "invalid order id");
-
     const order = await prisma.order.findUnique({
         where: {
             id: Number(id)
@@ -48,9 +46,6 @@ export const PlaceOrderController = async (req, res) => {
     const user = req.user;
 
     const { items, payment_method } = req.body;
-
-    if (!items || !Array.isArray(items) || !items.length) throw new ApiError(400, "invalid items");
-    if (!payment_method || !VALID_PAYMENT_METHODS.includes(payment_method)) throw new ApiError(400, "invalid payment method");
 
     // Collect all product ids and check if they exist
     const productIds = items.map(item => item.productId);

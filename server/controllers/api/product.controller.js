@@ -20,8 +20,6 @@ export const FetchProductController = async (req, res) => {
 
     const { id } = req.params;
 
-    if (!id || isNaN(id)) throw new ApiError(400, "invalid product id");
-
     const product = await prisma.product.findFirst({
         where: {
             AND: {
@@ -44,8 +42,6 @@ export const CreateProductController = async (req, res) => {
 
     const { product_name, product_description, product_offer, product_price, product_stock, categoryId } = req.body;
 
-    if (!product_name || !product_offer || !product_price || !product_stock || !categoryId) throw new ApiError(400, "missing product details");
-
     const newProduct = await prisma.product.create({
         data: {
             product_name,
@@ -66,9 +62,6 @@ export const UpdateProductController = async (req, res) => {
 
     const { id } = req.params;
     const { product_name, product_description, product_offer, product_price } = req.body;
-
-    if (!product_name || !product_description || !product_offer || !product_price) throw new ApiError(400, "missing product details");
-    if (!id || isNaN(id)) throw new ApiError(400, "invalid product id");
 
     const isProductExist = await prisma.product.findUnique({
         where: {
@@ -101,8 +94,6 @@ export const UpdateProductController = async (req, res) => {
 export const DeleteProductController = async (req, res) => {
 
     const { id } = req.params;
-
-    if (!id || isNaN(id)) throw new ApiError(400, "invalid product id");
 
     const isProductExist = await prisma.product.findFirst({
         where: {
