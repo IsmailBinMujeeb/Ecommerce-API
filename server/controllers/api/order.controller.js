@@ -1,0 +1,117 @@
+import prisma from "../../config/prisma.config.js";
+import { PaymentMethod, PaymentStatus, OrderStatus } from "@prisma/client"
+import { VALID_PAYMENT_METHODS } from "../../constants.js";
+import ApiError from "../../utils/ApiError.utils.js";
+import ApiResponse from "../../utils/ApiResponse.utils.js";
+
+export const FetchAllOrdersController = async (req, res) => {
+
+    const user = req.user;
+
+    const orders = await prisma.order.findMany({
+        where: {
+            userId: user.id,
+        },
+        include: {
+            items: true,
+            payment: true
+        }
+    });
+
+    return res.status(200).json(new ApiResponse(200, "fetched all orders successfully", orders))
+}
+
+export const FetchOrderController = async (req, res) => {
+
+    const { id } = req.params;
+
+    if (!id || isNaN(id)) throw new ApiError(400, "invalid order id");
+
+    const order = await prisma.order.findUnique({
+        where: {
+            id: Number(id)
+        },
+
+        include: {
+            items: true,
+            payment: true,
+        }
+    });
+
+    if (!order) throw new ApiError(404, "order not found");
+
+    return res.status(200).json(new ApiResponse(200, "fetcehd order successfully", order));
+}
+
+export const PlaceOrderController = async (req, res) => {
+
+    const user = req.user;
+
+    const { items, payment_method } = req.body;
+
+    if (!items || !Array.isArray(items) || !items.length) throw new ApiError(400, "invalid items");
+    if (!payment_method || !VALID_PAYMENT_METHODS.includes(payment_method)) throw new ApiError(400, "invalid payment method");
+
+    // Collect all product ids and check if they exist
+    const productIds = items.map(item => item.productId);
+    const dbProducts = await prisma.product.findMany({
+        where: {
+            AND: {
+                id: { in: productIds },
+                isDeleted: false
+            },
+        }
+    });
+    const productMap = new Map(dbProducts.map(p => [p.id, p]));
+
+    const orderItems = [];
+    let total = 0;
+
+    for (const item of items) {
+        const product = productMap.get(item.productId);
+        if (!product || product.product_stock < item.quantity)
+            throw new ApiError(409, `Insufficient stock for product id ${product?.id}`);
+
+        const discount = 1 - (product.product_offer / 100);
+        total += (product.product_price * discount) * item.quantity;
+
+        orderItems.push({
+            productId: product.id,
+            quantity: item.quantity,
+            price: product.product_price
+        });
+    }
+
+    const [newOrder] = await prisma.$transaction([
+        prisma.order.create({
+            data: {
+                total,
+                status: OrderStatus.PENDING,
+                userId: user.id,
+                items: { create: orderItems },
+                payment: {
+                    create: {
+                        amount: total,
+                        method: payment_method,
+                        status: PaymentStatus.INITIATED
+                    }
+                }
+            },
+            include: {
+                items: true,
+                payment: true
+            }
+        }),
+
+        ...orderItems.map(item =>
+            prisma.product.update({
+                where: { id: item.productId, isDeleted: false },
+                data: {
+                    product_stock: { decrement: item.quantity }
+                }
+            })
+        )
+    ]);
+
+    return res.status(200).json(new ApiResponse(200, "order placed successfully", newOrder));
+}

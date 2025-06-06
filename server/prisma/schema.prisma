@@ -113,7 +113,7 @@ model Product {
   cartItems           CartProduct[]
   reviews             Review[]
   orderItems          OrderItem[]
-  isDeleted           Boolean       @default(false)  
+  isDeleted           Boolean       @default(false)
   created_at          DateTime      @default(now())
   updated_at          DateTime      @updatedAt
 }
@@ -194,7 +194,6 @@ model Payment {
 }
 
 model Review {
-  id         Int      @id @default(autoincrement())
   userId     Int
   user       User     @relation(fields: [userId], references: [id])
   productId  Int
@@ -204,6 +203,7 @@ model Review {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
+  @@id([userId, productId])
   @@index([userId])
   @@index([productId])
 }

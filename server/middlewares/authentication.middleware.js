@@ -16,7 +16,7 @@ export default async (req, res, next) => {
     });
 
     if (!decoded) throw new ApiError(401, "Invalid access token");
-    
+
     const user = await prisma.user.findFirst({
         where: {
             id: decoded.userId
@@ -25,8 +25,10 @@ export default async (req, res, next) => {
             id: true,
             email: true,
             username: true,
-            display_name: true
-        }
+            display_name: true,
+            role: true,
+            permissions: true
+        },
     });
 
     if (!user) throw new ApiError(404, "User doesn't exist");
