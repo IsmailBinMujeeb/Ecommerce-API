@@ -1,5 +1,12 @@
 import { body, param } from "express-validator";
 
+export const FetchCategoryValidator = () => [
+    param("id")
+        .notEmpty().withMessage("Category ID is required").bail()
+        .isInt({ gt: 0 }).withMessage("Category ID must be a positive integer").bail()
+        .toInt(),
+]
+
 export const createCategoryValidator = () => [
     body("name")
         .trim()
