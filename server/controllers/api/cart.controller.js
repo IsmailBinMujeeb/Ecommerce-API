@@ -39,15 +39,18 @@ export const addCartController = async (req, res) => {
 
     if (!cart) throw new ApiError(404, "cart not found");
 
-    const product = await prisma.product.findUnique({
+    const product = await prisma.product.findFirst({
         where: {
-            id: productId
+            AND: {
+                id: productId,
+                isDeleted: false
+            }
         }
     });
 
     if (!product) throw new ApiError(404, "product not found");
 
-    const newCardItem = await prisma.cartProduct.create({
+    const newCartItem = await prisma.cartProduct.create({
         data: {
             cartId: cart.id,
             productId: product.id,
@@ -55,9 +58,9 @@ export const addCartController = async (req, res) => {
         }
     });
 
-    if (!newCardItem) throw new ApiError(500, "add product into card failed");
+    if (!newCartItem) throw new ApiError(500, "add product into card failed");
 
-    res.status(200).json(new ApiResponse(200, "item added to cart"));
+    res.status(200).json(new ApiResponse(200, "item added to cart", newCartItem));
 }
 
 export const updateCartController = async (req, res) => {
@@ -68,7 +71,7 @@ export const updateCartController = async (req, res) => {
 
     const item = await prisma.cartProduct.update({
         where: {
-            AND: {
+            cartId_productId: {
                 cartId,
                 productId
             }
@@ -80,7 +83,7 @@ export const updateCartController = async (req, res) => {
 
     if (!item) throw new ApiError(500, "updation failed for item");
 
-    return res.status(200).json(new ApiResponse(200, "quantity updated", { quantity }));
+    return res.status(200).json(new ApiResponse(200, "quantity updated", { item }));
 }
 
 export const removeProductFromCartController = async (req, res) => {
