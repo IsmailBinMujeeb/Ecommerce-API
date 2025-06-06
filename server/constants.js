@@ -1,3 +1,5 @@
+import { PaymentMethod } from "@prisma/client";
+
 export const MODERATOR_PERMISSIONS = {
     can_view_products: "can_view_products",
     can_view_categories: "can_view_categories",
@@ -22,3 +24,5 @@ export const MODERATOR_PERMISSIONS = {
 };
 
 export const AVAILABLE_MODERATOR_PERMISSIONS = Object.values(MODERATOR_PERMISSIONS);
+
+export const VALID_PAYMENT_METHODS = Object.values(PaymentMethod);
