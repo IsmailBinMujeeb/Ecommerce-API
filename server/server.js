@@ -12,6 +12,7 @@ import productRouter from "./routes/api/product.route.js";
 import categoryRouter from "./routes/api/category.route.js";
 import orderRouter from "./routes/api/order.route.js";
 import reviewRouter from "./routes/api/review.route.js";
+import permissionsRouter from "./routes/api/permission.route.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,5 +30,6 @@ app.use("/api/product", productRouter);
 app.use("/api/category", categoryRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/review", reviewRouter);
+app.use("/api/permission", permissionsRouter);
 
 export default app;
