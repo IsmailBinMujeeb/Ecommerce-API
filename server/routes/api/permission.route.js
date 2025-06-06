@@ -1,5 +1,5 @@
 import { Router } from "express";
-import AsyncHandlerUtils from "../../utils/AsyncHandler.utils.js";
+import AsyncHandler from "../../utils/AsyncHandler.utils.js";
 import { FetchModeratorPermissionsController, UpdateModeratorPermissionsController } from "../../controllers/api/permissions.controller.js";
 import authenticationMiddleware from "../../middlewares/authentication.middleware.js";
 import { UserRole } from "@prisma/client";
@@ -11,7 +11,7 @@ const router = Router();
 router.get(
     "/:id", // Endpoint /api/permission/:id
     authenticationMiddleware, // Middleware to authonticate user
-    AsyncHandlerUtils(async (req, res, next) => { // Middleware to authorize user
+    AsyncHandler(async (req, res, next) => { // Middleware to authorize user
 
         const user = req.user;
 
@@ -20,8 +20,8 @@ router.get(
 
         throw new ApiError(401, "unauthorized user");
     }),
-    AsyncHandlerUtils(FetchModeratorPermissionsController), // Controller
+    AsyncHandler(FetchModeratorPermissionsController), // Controller
 );
-router.post("/:id", authenticationMiddleware, AsyncHandlerUtils(permissionsMiddleware()), AsyncHandlerUtils(UpdateModeratorPermissionsController))
+router.post("/:id", authenticationMiddleware, AsyncHandler(permissionsMiddleware()), AsyncHandler(UpdateModeratorPermissionsController))
 
 export default router;
