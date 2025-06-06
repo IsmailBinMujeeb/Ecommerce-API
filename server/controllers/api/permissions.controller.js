@@ -8,7 +8,7 @@ export const FetchModeratorPermissionsController = async (req, res) => {
 
     const permissions = await prisma.permission.findUnique({
         where: {
-            moderatorId: Number(id),
+            moderatorId: id,
         }
     });
 
@@ -28,7 +28,7 @@ export const UpdateModeratorPermissionsController = async (req, res) => {
 
     const isPermissionExist = await prisma.permission.findUnique({
         where:{
-            moderatorId: Number(id),
+            moderatorId: id,
         }
     });
 
@@ -36,7 +36,7 @@ export const UpdateModeratorPermissionsController = async (req, res) => {
 
     const updatedPermissions = await prisma.permission.update({
         where: {
-            moderatorId: Number(id)
+            moderatorId: id
         },
         data: {
             ...permissions

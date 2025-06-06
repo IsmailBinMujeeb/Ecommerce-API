@@ -39,7 +39,7 @@ export const FetchUserByIdController = async (req, res) => {
 
     const user = await prisma.user.findUnique({
         where: {
-            id: Number(id)
+            id
         }
     });
 
@@ -65,7 +65,7 @@ export const PromoteUserToModeratorController = async (req, res) => {
     const isUserExistOrAlreadyPromoted = await prisma.user.findFirst({
         where: {
             AND: {
-                id: Number(id),
+                id,
                 role: UserRole.USER,
             }
         }
@@ -75,7 +75,7 @@ export const PromoteUserToModeratorController = async (req, res) => {
 
     const user = await prisma.user.update({
         where: {
-            id: Number(id)
+            id
         },
 
         data: {
@@ -86,7 +86,7 @@ export const PromoteUserToModeratorController = async (req, res) => {
                         ...permissions
                     },
                     where: {
-                        moderatorId: Number(id)
+                        moderatorId
                     }
                 }
             }
@@ -105,7 +105,7 @@ export const DemoteModeratorToUser = async (req, res) => {
     const isUserExistOrAlreadyANormalUser = await prisma.user.findFirst({
         where: {
             AND: {
-                id: Number(id),
+                id,
                 role: UserRole.MODE
             }
         }
@@ -115,7 +115,7 @@ export const DemoteModeratorToUser = async (req, res) => {
 
     const user = await prisma.user.update({
         where: {
-            id: Number(id)
+            id
         },
         data: {
             role: UserRole.USER,

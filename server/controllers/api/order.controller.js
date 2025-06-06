@@ -27,7 +27,7 @@ export const FetchOrderController = async (req, res) => {
 
     const order = await prisma.order.findUnique({
         where: {
-            id: Number(id)
+            id
         },
 
         include: {

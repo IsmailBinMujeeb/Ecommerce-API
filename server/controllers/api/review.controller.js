@@ -51,7 +51,7 @@ export const FetchAllReviewsForAProductController = async (req, res) => {
     const isProductExist = await prisma.product.findFirst({
         where: {
             AND: {
-                id: Number(id),
+                id,
                 isDeleted: false
             }
         }
@@ -61,7 +61,7 @@ export const FetchAllReviewsForAProductController = async (req, res) => {
 
     const reviews = await prisma.review.findMany({
         where: {
-            productId: Number(id),
+            productId: id,
         }
     });
 

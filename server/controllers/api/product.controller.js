@@ -23,7 +23,7 @@ export const FetchProductController = async (req, res) => {
     const product = await prisma.product.findFirst({
         where: {
             AND: {
-                id: Number(id),
+                id,
                 isDeleted: false
             }
         },
@@ -48,8 +48,8 @@ export const CreateProductController = async (req, res) => {
             product_offer,
             product_price,
             product_description,
-            product_stock: Number(product_stock),
-            categoryId: Number(categoryId)
+            product_stock: product_stock,
+            categoryId: categoryId
         }
     });
 
@@ -66,7 +66,7 @@ export const UpdateProductController = async (req, res) => {
     const isProductExist = await prisma.product.findUnique({
         where: {
             AND: {
-                id: Number(id),
+                id,
                 isDeleted: false
             }
         }
@@ -76,7 +76,7 @@ export const UpdateProductController = async (req, res) => {
 
     const updatedProduct = await prisma.product.update({
         where: {
-            id: Number(id)
+            id
         },
         data: {
             product_description,
@@ -98,7 +98,7 @@ export const DeleteProductController = async (req, res) => {
     const isProductExist = await prisma.product.findFirst({
         where: {
             AND: {
-                id: Number(id),
+                id,
                 isDeleted: false
             }
         }
@@ -108,7 +108,7 @@ export const DeleteProductController = async (req, res) => {
 
     const deletedProduct = await prisma.product.update({
         where: {
-            id: Number(id)
+            id
         },
         data: {
             isDeleted: true

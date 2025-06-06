@@ -17,10 +17,10 @@ export const FetchCategory = async (req, res) => {
 
     const { id } = req.params;
 
-    const category = await prisma.category.findUnique({
+    const category = await prisma.category.findFirst({
         where: {
             AND: {
-                id: Number(id),
+                id,
                 isDeleted: false
             }
         },
@@ -63,7 +63,7 @@ export const UpdateCategory = async (req, res) => {
     const isCategoryExist = await prisma.category.findFirst({
         where: {
             AND: {
-                id: Number(id),
+                id,
                 isDeleted: false
             }
         }
@@ -84,7 +84,7 @@ export const UpdateCategory = async (req, res) => {
 
     const updateCategory = await prisma.category.update({
         where: {
-            id: Number(id),
+            id
         },
         data: {
             name
@@ -100,7 +100,7 @@ export const DeleteCategory = async (req, res) => {
     const isCategoryExist = await prisma.category.findFirst({
         where: {
             AND: {
-                id: Number(id),
+                id,
                 isDeleted: false
             }
 
@@ -111,7 +111,7 @@ export const DeleteCategory = async (req, res) => {
 
     const deletedCategory = await prisma.category.update({
         where: {
-            id: Number(id)
+            id
         },
         data: {
             isDeleted: true
