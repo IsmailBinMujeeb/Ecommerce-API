@@ -10,8 +10,8 @@ const router = Router();
 
 router.get("/", AsyncHandlerUtils(FetchAllProductsController));
 router.get("/:id", AsyncHandlerUtils(FetchProductController));
-router.post("/", AsyncHandlerUtils(authenticationMiddleware), permissionsMiddleware(MODERATOR_PERMISSIONS.can_perform_crud_on_product), AsyncHandlerUtils(CreateProductController));
-router.put("/:id",  AsyncHandlerUtils(authenticationMiddleware), permissionsMiddleware(MODERATOR_PERMISSIONS.can_perform_crud_on_product), AsyncHandlerUtils(UpdateProductController));
-router.delete("/:id",  AsyncHandlerUtils(authenticationMiddleware), permissionsMiddleware(MODERATOR_PERMISSIONS.can_perform_crud_on_product), AsyncHandlerUtils(DeleteProductController));
+router.post("/", authenticationMiddleware, permissionsMiddleware(MODERATOR_PERMISSIONS.can_perform_crud_on_product), AsyncHandlerUtils(CreateProductController));
+router.put("/:id",  authenticationMiddleware, permissionsMiddleware(MODERATOR_PERMISSIONS.can_perform_crud_on_product), AsyncHandlerUtils(UpdateProductController));
+router.delete("/:id",  authenticationMiddleware, permissionsMiddleware(MODERATOR_PERMISSIONS.can_perform_crud_on_product), AsyncHandlerUtils(DeleteProductController));
 
 export default router;

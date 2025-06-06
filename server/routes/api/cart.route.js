@@ -5,9 +5,9 @@ import AsyncHandlerUtils from "../../utils/AsyncHandler.utils.js";
 
 const router = Router();
 
-router.get("/", AsyncHandlerUtils(authenticationMiddleware), AsyncHandlerUtils(getUserCartContorller));
-router.post("/add", AsyncHandlerUtils(authenticationMiddleware), AsyncHandlerUtils(addCartController));
-router.put("/update", AsyncHandlerUtils(authenticationMiddleware), AsyncHandlerUtils(updateCartController));
-router.delete("/remove", AsyncHandlerUtils(authenticationMiddleware), AsyncHandlerUtils(removeProductFromCartController));
+router.get("/", authenticationMiddleware, AsyncHandlerUtils(getUserCartContorller));
+router.post("/add", authenticationMiddleware, AsyncHandlerUtils(addCartController));
+router.put("/update", authenticationMiddleware, AsyncHandlerUtils(updateCartController));
+router.delete("/remove", authenticationMiddleware, AsyncHandlerUtils(removeProductFromCartController));
 
 export default router;

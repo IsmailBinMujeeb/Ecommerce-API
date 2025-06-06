@@ -5,7 +5,7 @@ import AsyncHandlerUtils from "../../utils/AsyncHandler.utils.js";
 
 const router = Router();
 
-router.post("/", AsyncHandlerUtils(authenticationMiddleware), AsyncHandlerUtils(CreateReviewController));
+router.post("/", authenticationMiddleware, AsyncHandlerUtils(CreateReviewController));
 router.get("/:id", AsyncHandlerUtils(FetchAllReviewsForAProductController));
 
 export default router;

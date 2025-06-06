@@ -10,7 +10,7 @@ const router = Router();
 
 router.get(
     "/:id", // Endpoint /api/permission/:id
-    AsyncHandlerUtils(authenticationMiddleware), // Middleware to authonticate user
+    authenticationMiddleware, // Middleware to authonticate user
     AsyncHandlerUtils(async (req, res, next) => { // Middleware to authorize user
 
         const user = req.user;
@@ -22,6 +22,6 @@ router.get(
     }),
     AsyncHandlerUtils(FetchModeratorPermissionsController), // Controller
 );
-router.post("/:id", AsyncHandlerUtils(authenticationMiddleware), AsyncHandlerUtils(permissionsMiddleware()), AsyncHandlerUtils(UpdateModeratorPermissionsController))
+router.post("/:id", authenticationMiddleware, AsyncHandlerUtils(permissionsMiddleware()), AsyncHandlerUtils(UpdateModeratorPermissionsController))
 
 export default router;

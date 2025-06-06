@@ -10,8 +10,8 @@ const router = Router();
 
 router.get("/", AsyncHandlerUtils(FetchAllCategories));
 router.get("/:id", AsyncHandlerUtils(FetchCategory));
-router.post("/", AsyncHandlerUtils(authenticationMiddleware), permissionsMiddleware(MODERATOR_PERMISSIONS.can_perform_crud_on_category), AsyncHandlerUtils(CreateCategory));
-router.put("/:id", AsyncHandlerUtils(authenticationMiddleware), permissionsMiddleware(MODERATOR_PERMISSIONS.can_perform_crud_on_category), AsyncHandlerUtils(UpdateCategory));
-router.delete("/:id", AsyncHandlerUtils(authenticationMiddleware), permissionsMiddleware(MODERATOR_PERMISSIONS.can_perform_crud_on_category), AsyncHandlerUtils(DeleteCategory));
+router.post("/", authenticationMiddleware, permissionsMiddleware(MODERATOR_PERMISSIONS.can_perform_crud_on_category), AsyncHandlerUtils(CreateCategory));
+router.put("/:id", authenticationMiddleware, permissionsMiddleware(MODERATOR_PERMISSIONS.can_perform_crud_on_category), AsyncHandlerUtils(UpdateCategory));
+router.delete("/:id", authenticationMiddleware, permissionsMiddleware(MODERATOR_PERMISSIONS.can_perform_crud_on_category), AsyncHandlerUtils(DeleteCategory));
 
 export default router;

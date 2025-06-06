@@ -1,8 +1,9 @@
 import ApiError from "../utils/ApiError.utils.js";
 import jwt from "jsonwebtoken";
 import prisma from "../config/prisma.config.js";
+import AsyncHandler from "../utils/AsyncHandler.utils.js";
 
-export default async (req, res, next) => {
+export default AsyncHandler(async (req, res, next) => {
 
     const incomming_access_token = req.cookies.access_token;
 
@@ -35,4 +36,4 @@ export default async (req, res, next) => {
 
     req.user = user;
     next();
-}
+})
