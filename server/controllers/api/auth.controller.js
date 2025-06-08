@@ -152,24 +152,6 @@ export const UserLogoutController = async (req, res) => {
     return res.status(200).json(ApiResponse.UserResponse(200, "user logged out successfully"));
 }
 
-export const getLoginUserController = async (req, res) => {
-
-    const id = req.user.id;
-
-    const user = await prisma.user.findFirst({
-        where: {
-            id
-        },
-        include: {
-            address: true,
-        }
-    });
-
-    if (!user) throw new ApiError(404, "User not found");
-
-    return res.status(200).json(ApiResponse.UserResponse(200, "User fetched successfully", user));
-}
-
 export const emailVerificationController = async (req, res) => {
 
     const unhashedToken = req.params.token;

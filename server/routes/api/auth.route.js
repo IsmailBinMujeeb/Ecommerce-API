@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { UserRegisterController, UserLoginController, UserLogoutController, getLoginUserController, emailVerificationController, refreshAccessToken, saveUserAddressController, getUserAddressController } from '../../controllers/api/auth.controller.js';
+import { UserRegisterController, UserLoginController, UserLogoutController, emailVerificationController, refreshAccessToken, saveUserAddressController, getUserAddressController } from '../../controllers/api/auth.controller.js';
 import { UserLoginValidator, UserLogoutValidator, UserRegisterValidator, emailVerificationValidator, refreshAccessTokenValidator, saveUserAddressValidator } from "../../validators/auth.validator.js";
 import validatorMiddleware from '../../middlewares/validator.middleware.js';
 import AsyncHandler from '../../utils/AsyncHandler.utils.js';
@@ -10,7 +10,6 @@ const router = Router();
 router.post('/register', UserRegisterValidator(), validatorMiddleware, AsyncHandler(UserRegisterController));
 router.post('/login', UserLoginValidator(), validatorMiddleware, AsyncHandler(UserLoginController));
 router.post('/logout', UserLogoutValidator(), validatorMiddleware, AsyncHandler(UserLogoutController));
-router.get('/', authenticationMiddleware, AsyncHandler(getLoginUserController));
 router.get('/verify-email/:token', emailVerificationValidator(), validatorMiddleware, AsyncHandler(emailVerificationController));
 router.post('/refresh-token', refreshAccessTokenValidator(), validatorMiddleware, AsyncHandler(refreshAccessToken));
 router.post('/address', saveUserAddressValidator(), authenticationMiddleware, validatorMiddleware, AsyncHandler(saveUserAddressController));
