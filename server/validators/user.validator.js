@@ -1,4 +1,4 @@
-import { param, body } from "express-validator";
+import { param, body, query } from "express-validator";
 import { MODERATOR_PERMISSIONS } from "../constants.js";
 
 const permissionsKeys = Object.values(MODERATOR_PERMISSIONS);
@@ -10,6 +10,18 @@ export const FetchUserByIdValidator = () => [
         .isInt({ gt: 0 }).withMessage("user id must be a positive integer")
         .toInt(),
 ];
+
+export const BanUserValidator = () => [
+    param("id")
+        .notEmpty().withMessage("user id is required")
+        .bail()
+        .isInt({ gt: 0 }).withMessage("user id must be a positive integer")
+        .toInt(),
+    query("ttb")
+        .optional()
+        .isInt({ gt: 0 }).withMessage("time to ban (ttb) must be a positive integer")
+        .toInt(),
+]
 
 export const PromoteUserToModeratorValidator = () => [
     param("id")
