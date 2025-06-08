@@ -7,11 +7,12 @@ import { MODERATOR_PERMISSIONS } from "../../constants.js";
 import authenticationMiddleware from "../../middlewares/authentication.middleware.js";
 import permissionsMiddleware from "../../middlewares/permissions.middleware.js";
 import AsyncHandler from "../../utils/AsyncHandler.utils.js";
+import cacheMiddleware from "../../middlewares/cache.middleware.js";
 
 const router = Router();
 
-router.get("/", AsyncHandler(FetchAllCategories));
-router.get("/:id", FetchCategoryValidator(), validatorMiddleware, AsyncHandler(FetchCategory));
+router.get("/", cacheMiddleware(`categories`), AsyncHandler(FetchAllCategories));
+router.get("/:id", FetchCategoryValidator(), validatorMiddleware, cacheMiddleware(req => `category:${req.params.id}`), AsyncHandler(FetchCategory));
 router.post("/", authenticationMiddleware, permissionsMiddleware(MODERATOR_PERMISSIONS.can_perform_crud_on_category), createCategoryValidator(), validatorMiddleware, AsyncHandler(CreateCategory));
 router.put("/:id", authenticationMiddleware, permissionsMiddleware(MODERATOR_PERMISSIONS.can_perform_crud_on_category), categoryIdParamValidator(), updateCategoryValidator(), validatorMiddleware, AsyncHandler(UpdateCategory));
 router.delete("/:id", authenticationMiddleware, permissionsMiddleware(MODERATOR_PERMISSIONS.can_perform_crud_on_category), categoryIdParamValidator(), validatorMiddleware, AsyncHandler(DeleteCategory));

@@ -1,6 +1,7 @@
 import prisma from "../../config/prisma.config.js"
 import ApiError from "../../utils/ApiError.utils.js"
 import ApiResponse from "../../utils/ApiResponse.utils.js"
+import redis from "../../config/redis.config.js"
 
 export const FetchAllCategories = async (req, res) => {
 
@@ -53,6 +54,11 @@ export const CreateCategory = async (req, res) => {
 
     if (!newCategory) throw new ApiError(500, "category creation failed");
 
+    await redis.del(`category:${newCategory.id}`)
+    await redis.del(`categories`)
+
+    await redis.setex(`category:${newCategory.id}`, 300, JSON.stringify(newCategory))
+
     return res.status(201).json(new ApiResponse(201, "category created successfully", newCategory));
 }
 export const UpdateCategory = async (req, res) => {
@@ -91,6 +97,11 @@ export const UpdateCategory = async (req, res) => {
         }
     });
 
+    await redis.del(`category:${updateCategory.id}`)
+    await redis.del(`categories`)
+
+    await redis.setex(`category:${updateCategory.id}`, 300, JSON.stringify(updateCategory))
+
     return res.status(200).json(new ApiResponse(200, "cateogry updated successfully", updateCategory));
 }
 export const DeleteCategory = async (req, res) => {
@@ -117,6 +128,9 @@ export const DeleteCategory = async (req, res) => {
             isDeleted: true
         }
     });
+
+    await redis.del(`category:${deletedCategory.id}`);
+    await redis.del("categories")
 
     return res.status(200).json(new ApiResponse(200, "category deleted successfully", deletedCategory));
 }

@@ -3,6 +3,7 @@ import { PaymentMethod, PaymentStatus, OrderStatus } from "@prisma/client"
 import { VALID_PAYMENT_METHODS } from "../../constants.js";
 import ApiError from "../../utils/ApiError.utils.js";
 import ApiResponse from "../../utils/ApiResponse.utils.js";
+import redis from "../../config/redis.config.js";
 
 export const FetchAllOrdersController = async (req, res) => {
 
@@ -107,6 +108,10 @@ export const PlaceOrderController = async (req, res) => {
             })
         )
     ]);
+
+    await redis.del(`orders:${user.id}`)
+
+    await redis.setex(`order:${newOrder.id}`, 300, JSON.stringify(newOrder))
 
     return res.status(200).json(new ApiResponse(200, "order placed successfully", newOrder));
 }

@@ -1,4 +1,5 @@
 import prisma from "../../config/prisma.config.js"
+import redis from "../../config/redis.config.js";
 import ApiError from "../../utils/ApiError.utils.js";
 import ApiResponse from "../../utils/ApiResponse.utils.js";
 
@@ -55,6 +56,8 @@ export const CreateProductController = async (req, res) => {
 
     if (!newProduct) throw new ApiError(500, "product creation failed");
 
+    await redis.setex(`product:${newProduct.id}`, 300, JSON.stringify(newProduct));
+
     return res.status(201).json(new ApiResponse(201, "product created successfully", newProduct));
 }
 
@@ -88,6 +91,9 @@ export const UpdateProductController = async (req, res) => {
 
     if (!updatedProduct) throw new ApiError(500, "product update failed");
 
+    await redis.del(`product:${id}`);
+    await redis.setex(`product:${id}`, 300, JSON.stringify(updatedProduct));
+
     return res.status(200).json(new ApiResponse(200, "product update successfully", updatedProduct));
 }
 
@@ -116,6 +122,8 @@ export const DeleteProductController = async (req, res) => {
     });
 
     if (!deletedProduct) throw new ApiError(500, "product deletion failed");
+
+    await redis.del(`product:${id}`)
 
     return res.status(200).json(new ApiResponse(200, "product deleted successfully", deletedProduct))
 }

@@ -1,6 +1,7 @@
 import prisma from "../../config/prisma.config.js";
 import ApiError from "../../utils/ApiError.utils.js";
 import ApiResponse from "../../utils/ApiResponse.utils.js";
+import redis from "../../config/redis.config.js";
 
 export const CreateReviewController = async (req, res) => {
 
@@ -39,6 +40,9 @@ export const CreateReviewController = async (req, res) => {
     });
 
     if (!newReveiw) throw new ApiError(500, "review creation failed");
+
+    await redis.del(`reviews:${productId}`);
+    await redis.setex(`reviews:${productId}`, 300, JSON.stringify(newReveiw))
 
     return res.status(201).json(new ApiResponse(201, "review created successfully", newReveiw));
 

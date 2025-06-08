@@ -2,6 +2,7 @@ import prisma from "../../config/prisma.config.js";
 import ApiError from "../../utils/ApiError.utils.js";
 import ApiResponse from "../../utils/ApiResponse.utils.js";
 import { UserRole } from "@prisma/client";
+import redis from "../../config/redis.config.js";
 
 export const FetchAuthenticatedUserController = async (req, res) => {
 
@@ -95,6 +96,10 @@ export const PromoteUserToModeratorController = async (req, res) => {
 
     if (!user) throw new ApiError(500, "user promotion failed");
 
+    await redis.del(`me:${user.id}`)
+    await redis.del(`user:${user.id}`)
+    await redis.del(`users`)
+
     return res.status(200).json(ApiResponse.UserResponse(200, "user promoted successfully", user));
 }
 
@@ -124,6 +129,10 @@ export const DemoteModeratorToUser = async (req, res) => {
     });
 
     if (!user) throw new ApiError(500, "user demotion failed");
+
+    await redis.del(`me:${user.id}`)
+    await redis.del(`user:${user.id}`)
+    await redis.del(`users`)
 
     return res.status(200).json(ApiResponse.UserResponse(200, "user demoted successfully", user))
 }

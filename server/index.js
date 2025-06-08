@@ -1,9 +1,12 @@
 import app from "./server.js";
+import redis from "./config/redis.config.js";
 
 ;(
-    function (){
-        const PORT = app.get('port');
+    function () {
 
-        app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+        redis.once("ready", () => {
+            const PORT = app.get('port');
+            app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+        });
     }
 )();

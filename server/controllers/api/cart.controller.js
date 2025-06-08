@@ -1,6 +1,7 @@
 import prisma from "../../config/prisma.config.js";
 import ApiError from "../../utils/ApiError.utils.js";
 import ApiResponse from "../../utils/ApiResponse.utils.js";
+import redis from "../../config/redis.config.js";
 
 export const getUserCartContorller = async (req, res) => {
 
@@ -58,6 +59,7 @@ export const addCartController = async (req, res) => {
 
     if (!newCartItem) throw new ApiError(500, "add product into card failed");
 
+    await redis.del(`cart:${cart.id}`);
     res.status(200).json(new ApiResponse(200, "item added to cart", newCartItem));
 }
 
@@ -79,6 +81,7 @@ export const updateCartController = async (req, res) => {
 
     if (!item) throw new ApiError(500, "updation failed for item");
 
+    await redis.del(`cart:${cartId}`);
     return res.status(200).json(new ApiResponse(200, "quantity updated", { item }));
 }
 
@@ -97,5 +100,6 @@ export const removeProductFromCartController = async (req, res) => {
 
     if (!item) throw new ApiError(404, "item not found");
 
+    await redis.del(`cart:${cartId}`);
     return res.status(200).json(new ApiResponse(200, "item removed from cart", item))
 }

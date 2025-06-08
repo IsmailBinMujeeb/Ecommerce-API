@@ -7,6 +7,7 @@ import authenticationMiddleware from "../../middlewares/authentication.middlewar
 import { UserRole } from "@prisma/client";
 import permissionsMiddleware from "../../middlewares/permissions.middleware.js";
 import ApiError from "../../utils/ApiError.utils.js";
+import cacheMiddleware from "../../middlewares/cache.middleware.js";
 
 const router = Router();
 
@@ -24,6 +25,7 @@ router.get(
     }),
     FetchModeratorPermissionsValidator(),
     validatorMiddleware,
+    cacheMiddleware(req => `permission:${req.id}`),
     AsyncHandler(FetchModeratorPermissionsController), // Controller
 );
 router.post("/:id", authenticationMiddleware, AsyncHandler(permissionsMiddleware()), UpdateModeratorPermissionsValidator(), validatorMiddleware, AsyncHandler(UpdateModeratorPermissionsController))

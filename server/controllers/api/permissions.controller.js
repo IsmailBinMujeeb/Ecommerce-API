@@ -1,6 +1,7 @@
 import prisma from "../../config/prisma.config.js";
 import ApiError from "../../utils/ApiError.utils.js";
 import ApiResponse from "../../utils/ApiResponse.utils.js";
+import redis from "../../config/redis.config.js";
 
 export const FetchModeratorPermissionsController = async (req, res) => {
 
@@ -44,6 +45,9 @@ export const UpdateModeratorPermissionsController = async (req, res) => {
     });
 
     if (!updatedPermissions) throw new ApiError(500, "permission update failed");
+
+    await redis.del(`permission:${updatedPermissions.moderatorId}`);
+    await redis.setex(`permission:${updatedPermissions.moderatorId}`, 300, JSON.stringify(updatedPermissions));
 
     return res.status(200).json(new ApiResponse(200, "permissions updated successfully", updatedPermissions))
 }
