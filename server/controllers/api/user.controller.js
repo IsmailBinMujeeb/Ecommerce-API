@@ -20,11 +20,13 @@ export const FetchAuthenticatedUserController = async (req, res) => {
             permissions: true,
             reviews: true,
         }
-    });
+    },);
 
     if (!user) throw new ApiError(404, "user not found");
 
-    return res.status(200).json(ApiResponse.UserResponse(200, "fetched user data successfully", user));
+    const isUserBanned = await redis.get(`ban:${id}`)
+
+    return res.status(200).json(ApiResponse.UserResponse(200, "fetched user data successfully", {...user, isUserBanned: Boolean(isUserBanned)}));
 }
 
 export const FetchAllUsersController = async (req, res) => {
@@ -51,7 +53,29 @@ export const FetchUserByIdController = async (req, res) => {
 
 export const BanUserController = async (req, res) => {
 
-    // TODO: Add Ban User bussiness logic
+    const { id } = req.params;
+    const { ttb = 34560 } = req.query;
+
+    const isUserExist = await prisma.user.findUnique({
+        where: {
+            id: Number(id)
+        }
+    });
+
+    if (!isUserExist) throw new ApiError(404, "user not found")
+
+    const isUserBanned = await redis.get(`ban:${id}`);
+
+    if (isUserBanned) throw new ApiError(409, "user already banned");
+
+    await redis.setex(`ban:${id}`, ttb, id);
+
+    await redis.del(`me:${id}`)
+    await redis.del(`user:${id}`)
+    await redis.del(`users`)
+
+    return res.status(200).json(new ApiResponse(200, "user banned successfully", { id, ttb }));
+
 }
 
 export const PromoteUserToModeratorController = async (req, res) => {

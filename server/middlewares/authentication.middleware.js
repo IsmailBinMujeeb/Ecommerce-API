@@ -2,6 +2,7 @@ import ApiError from "../utils/ApiError.utils.js";
 import jwt from "jsonwebtoken";
 import prisma from "../config/prisma.config.js";
 import AsyncHandler from "../utils/AsyncHandler.utils.js";
+import redis from "../config/redis.config.js";
 
 export default AsyncHandler(async (req, res, next) => {
 
@@ -17,6 +18,9 @@ export default AsyncHandler(async (req, res, next) => {
     });
 
     if (!decoded) throw new ApiError(401, "Invalid access token");
+
+    const isUserBanned = await redis.get(`ban:${decoded.userId}`);
+    if (isUserBanned) throw new ApiError(400, "user is banned");
 
     const user = await prisma.user.findFirst({
         where: {
