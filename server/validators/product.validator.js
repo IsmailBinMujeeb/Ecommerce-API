@@ -1,4 +1,16 @@
-import { param, body } from "express-validator";
+import { param, body, query } from "express-validator";
+
+export const FetchAllProductsValidator = () => [
+    query("cursor")
+        .optional()
+        .isInt({ gt: 0 }).withMessage("cursor must be a positive integer").bail()
+        .toInt(),
+
+    query("limit")
+        .optional()
+        .isInt({ gt: 0 }).withMessage("limit must be a positive integer").bail()
+        .toInt(),
+];
 
 export const FetchProductValidator = () => [
     param("id")

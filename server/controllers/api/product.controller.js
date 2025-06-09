@@ -2,19 +2,36 @@ import prisma from "../../config/prisma.config.js"
 import redis from "../../config/redis.config.js";
 import ApiError from "../../utils/ApiError.utils.js";
 import ApiResponse from "../../utils/ApiResponse.utils.js";
+import { matchedData } from "express-validator";
+import { deleteAllRedisKeys } from "../../utils/helper.utils.js";
 
 export const FetchAllProductsController = async (req, res) => {
 
+    const query = matchedData(req, { locations: ["query"] });
+    const { cursor, limit = 10 } = query;
+
     const products = await prisma.product.findMany({
+        take: limit,
+        ...(cursor && {
+            skip: 1,
+            cursor: { id: cursor }
+        }),
         where: {
             isDeleted: false
         },
         include: {
             category: true,
+        },
+        orderBy: {
+            id: "asc"
         }
     });
 
-    return res.status(200).json(new ApiResponse(200, "fetched all producrs successfully", products));
+    if (!products.length) throw new ApiError(404, "products not found");
+
+    const nextCursor = products.length === limit ? products[products.length - 1].id : null;
+
+    return res.status(200).json(new ApiResponse(200, "fetched all producrs successfully", { products, nextCursor }));
 }
 
 export const FetchProductController = async (req, res) => {
@@ -57,6 +74,7 @@ export const CreateProductController = async (req, res) => {
     if (!newProduct) throw new ApiError(500, "product creation failed");
 
     await redis.setex(`product:${newProduct.id}`, 300, JSON.stringify(newProduct));
+    deleteAllRedisKeys(`products:*:*`)
 
     return res.status(201).json(new ApiResponse(201, "product created successfully", newProduct));
 }
@@ -93,6 +111,7 @@ export const UpdateProductController = async (req, res) => {
 
     await redis.del(`product:${id}`);
     await redis.setex(`product:${id}`, 300, JSON.stringify(updatedProduct));
+    deleteAllRedisKeys(`products:*:*`)
 
     return res.status(200).json(new ApiResponse(200, "product update successfully", updatedProduct));
 }
@@ -123,7 +142,8 @@ export const DeleteProductController = async (req, res) => {
 
     if (!deletedProduct) throw new ApiError(500, "product deletion failed");
 
-    await redis.del(`product:${id}`)
+    await redis.del(`product:${id}`);
+    deleteAllRedisKeys(`products:*:*`)
 
     return res.status(200).json(new ApiResponse(200, "product deleted successfully", deletedProduct))
 }
