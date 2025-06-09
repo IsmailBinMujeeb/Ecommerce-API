@@ -3,6 +3,18 @@ import { MODERATOR_PERMISSIONS } from "../constants.js";
 
 const permissionsKeys = Object.values(MODERATOR_PERMISSIONS);
 
+export const FetchAllUserValidator = () => [
+    query("cursor")
+        .optional()
+        .isInt({ gt: 0 }).withMessage("cursor must be a positive integer")
+        .toInt(),
+
+    query("limit")
+        .optional()
+        .isInt({ gt: 0 }).withMessage("limit must be a positive integer")
+        .toInt(),
+];
+
 export const FetchUserByIdValidator = () => [
     param("id")
         .notEmpty().withMessage("user id is required")

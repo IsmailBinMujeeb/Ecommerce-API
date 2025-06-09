@@ -3,6 +3,8 @@ import ApiError from "../../utils/ApiError.utils.js";
 import ApiResponse from "../../utils/ApiResponse.utils.js";
 import { UserRole } from "@prisma/client";
 import redis from "../../config/redis.config.js";
+import { matchedData } from "express-validator";
+import { deleteAllRedisKeys } from "../../utils/helper.utils.js";
 
 export const FetchAuthenticatedUserController = async (req, res) => {
 
@@ -26,14 +28,39 @@ export const FetchAuthenticatedUserController = async (req, res) => {
 
     const isUserBanned = await redis.get(`ban:${id}`)
 
-    return res.status(200).json(ApiResponse.UserResponse(200, "fetched user data successfully", {...user, isUserBanned: Boolean(isUserBanned)}));
+    return res.status(200).json(ApiResponse.UserResponse(200, "fetched user data successfully", { ...user, isUserBanned: Boolean(isUserBanned) }));
 }
 
 export const FetchAllUsersController = async (req, res) => {
 
-    const users = await prisma.user.findMany({ where: {} });
+    const query = matchedData(req, { locations: ['query'] });
+    const { cursor, limit = 10 } = query;
 
-    return res.status(200).json(ApiResponse.UserResponse(200, "fetched all users successfully", users));
+    const users = await prisma.user.findMany({
+
+        take: limit,
+        ...(cursor && {
+            skip: 1,
+            cursor: { id: cursor }
+        }),
+        orderBy: {
+            id: "asc"
+        }
+    });
+
+    if (!users.length) throw new ApiError(404, "users not found");
+
+    const bannedKeys = users.map(user => `ban:${user.id}`);
+    const bannedStatuses = await redis.mget(bannedKeys);
+
+    const usersWithIsBannedField = users.map((user, index) => ({
+        ...user,
+        isBanned: bannedStatuses[index] !== null
+    }))
+
+    const nextCursor = users.length === limit ? users[users.length - 1].id : null;
+
+    return res.status(200).json(ApiResponse.UserResponse(200, "fetched all users successfully", { users: usersWithIsBannedField, nextCursor }));
 }
 
 export const FetchUserByIdController = async (req, res) => {
@@ -68,11 +95,11 @@ export const BanUserController = async (req, res) => {
 
     if (isUserBanned) throw new ApiError(409, "user already banned");
 
-    await redis.setex(`ban:${id}`, ttb, id);
+    await redis.setex(`ban:${id}`, 90, id);
 
     await redis.del(`me:${id}`)
     await redis.del(`user:${id}`)
-    await redis.del(`users`)
+    deleteAllRedisKeys(`users:*:*`)
 
     return res.status(200).json(new ApiResponse(200, "user banned successfully", { id, ttb }));
 
@@ -122,7 +149,7 @@ export const PromoteUserToModeratorController = async (req, res) => {
 
     await redis.del(`me:${user.id}`)
     await redis.del(`user:${user.id}`)
-    await redis.del(`users`)
+    deleteAllRedisKeys(`users:*:*`)
 
     return res.status(200).json(ApiResponse.UserResponse(200, "user promoted successfully", user));
 }
@@ -156,7 +183,7 @@ export const DemoteModeratorToUser = async (req, res) => {
 
     await redis.del(`me:${user.id}`)
     await redis.del(`user:${user.id}`)
-    await redis.del(`users`)
+    deleteAllRedisKeys(`users:*:*`)
 
     return res.status(200).json(ApiResponse.UserResponse(200, "user demoted successfully", user))
 }
