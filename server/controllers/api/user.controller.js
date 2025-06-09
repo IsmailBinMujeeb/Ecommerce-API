@@ -138,7 +138,7 @@ export const PromoteUserToModeratorController = async (req, res) => {
                         ...permissions
                     },
                     where: {
-                        moderatorId
+                        moderatorId: id
                     }
                 }
             }
