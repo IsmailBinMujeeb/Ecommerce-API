@@ -1,5 +1,17 @@
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 import { VALID_PAYMENT_METHODS } from "../constants.js";
+
+export const FetchAllOrdersValidator = () => [
+    query("cursor")
+        .optional()
+        .isInt({ gt: 0 }).withMessage("cursor must be a positive integer")
+        .toInt(),
+
+    query("limit")
+        .optional()
+        .isInt({ gt: 0 }).withMessage("limit must be a positive integer")
+        .toInt(),
+]
 
 export const fetchOrderValidator = () => [
     param("id")

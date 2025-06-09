@@ -4,22 +4,39 @@ import { VALID_PAYMENT_METHODS } from "../../constants.js";
 import ApiError from "../../utils/ApiError.utils.js";
 import ApiResponse from "../../utils/ApiResponse.utils.js";
 import redis from "../../config/redis.config.js";
+import { deleteAllRedisKeys } from "../../utils/helper.utils.js";
+import { matchedData } from "express-validator";
 
 export const FetchAllOrdersController = async (req, res) => {
 
     const user = req.user;
+    const query = matchedData(req, { locations: ["query"] });
+
+    const { cursor, limit = 10 } = query;
 
     const orders = await prisma.order.findMany({
+        take: limit,
+        ...(cursor && {
+            skip: cursor === 1 ? 0 : 1,
+            cursor: { id: cursor }
+        }),
         where: {
             userId: user.id,
         },
         include: {
             items: true,
             payment: true
+        },
+        orderBy: {
+            id: "asc"
         }
     });
 
-    return res.status(200).json(new ApiResponse(200, "fetched all orders successfully", orders))
+    if (!orders.length) throw new ApiError(404, "orders not found");
+
+    let nextCursor = orders.length === limit ? orders[orders.length - 1].id : null;
+
+    return res.status(200).json(new ApiResponse(200, "fetched all orders successfully", { orders, nextCursor }))
 }
 
 export const FetchOrderController = async (req, res) => {
@@ -109,7 +126,7 @@ export const PlaceOrderController = async (req, res) => {
         )
     ]);
 
-    await redis.del(`orders:${user.id}`)
+    deleteAllRedisKeys(`orders:${user.id}:*:*`);
 
     await redis.setex(`order:${newOrder.id}`, 300, JSON.stringify(newOrder))
 
