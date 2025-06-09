@@ -9,12 +9,12 @@ export const FetchAllCategories = async (req, res) => {
 
     const query = matchedData(req, { locations: ["query"] });
 
-    const { cursor = 1, limit = 10 } = query;
+    const { cursor, limit = 10 } = query;
 
     const categories = await prisma.category.findMany({
         take: limit,
         ...(cursor && {
-            skip: cursor === 1 ? 0 : 1,
+            skip: 1,
             cursor: { id: cursor }
         }),
         where: {
@@ -24,6 +24,8 @@ export const FetchAllCategories = async (req, res) => {
             id: "asc"
         }
     });
+
+    if (!categories.length) throw new ApiError(404, "categories not found");
 
     let nextCursor = categories.length === limit ? categories[categories.length - 1].id : null;
 

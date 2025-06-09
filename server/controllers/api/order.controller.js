@@ -17,7 +17,7 @@ export const FetchAllOrdersController = async (req, res) => {
     const orders = await prisma.order.findMany({
         take: limit,
         ...(cursor && {
-            skip: cursor === 1 ? 0 : 1,
+            skip: 1,
             cursor: { id: cursor }
         }),
         where: {
