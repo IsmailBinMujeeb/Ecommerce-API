@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import redis from '../config/redis.config.js';
 
 export const generateTemporaryTokens = () => {
 
@@ -10,4 +11,12 @@ export const generateTemporaryTokens = () => {
         hashedToken,
         tokenExpiry
     };
+}
+
+export const deleteAllRedisKeys = async (match) => {
+
+    const keys = await redis.keys(match);
+    if (keys.length) await redis.del(keys);
+
+    return keys.length;
 }

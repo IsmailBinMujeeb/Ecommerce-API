@@ -2,21 +2,38 @@ import prisma from "../../config/prisma.config.js"
 import ApiError from "../../utils/ApiError.utils.js"
 import ApiResponse from "../../utils/ApiResponse.utils.js"
 import redis from "../../config/redis.config.js"
+import { matchedData } from "express-validator"
+import { deleteAllRedisKeys } from "../../utils/helper.utils.js"
 
 export const FetchAllCategories = async (req, res) => {
 
+    const query = matchedData(req, { locations: ["query"] });
+
+    const { cursor = 1, limit = 10 } = query;
+
     const categories = await prisma.category.findMany({
+        take: limit,
+        ...(cursor && {
+            skip: cursor === 1 ? 0 : 1,
+            cursor: { id: cursor }
+        }),
         where: {
             isDeleted: false
+        },
+        orderBy: {
+            id: "asc"
         }
-    })
+    });
 
-    return res.status(200).json(new ApiResponse(200, "Fetched all categories successfully", categories))
+    let nextCursor = categories.length === limit ? categories[categories.length - 1].id : null;
+
+    return res.status(200).json(new ApiResponse(200, "Fetched all categories successfully", { categories, nextCursor }))
 }
 
 export const FetchCategory = async (req, res) => {
 
     const { id } = req.params;
+
 
     const category = await prisma.category.findFirst({
         where: {
@@ -55,9 +72,7 @@ export const CreateCategory = async (req, res) => {
     if (!newCategory) throw new ApiError(500, "category creation failed");
 
     await redis.del(`category:${newCategory.id}`)
-    await redis.del(`categories`)
-
-    await redis.setex(`category:${newCategory.id}`, 300, JSON.stringify(newCategory))
+    deleteAllRedisKeys("categories:*:*");
 
     return res.status(201).json(new ApiResponse(201, "category created successfully", newCategory));
 }
@@ -98,7 +113,7 @@ export const UpdateCategory = async (req, res) => {
     });
 
     await redis.del(`category:${updateCategory.id}`)
-    await redis.del(`categories`)
+    deleteAllRedisKeys("categories:*:*")
 
     await redis.setex(`category:${updateCategory.id}`, 300, JSON.stringify(updateCategory))
 
@@ -130,7 +145,7 @@ export const DeleteCategory = async (req, res) => {
     });
 
     await redis.del(`category:${deletedCategory.id}`);
-    await redis.del("categories")
+    deleteAllRedisKeys("categories:*:*")
 
     return res.status(200).json(new ApiResponse(200, "category deleted successfully", deletedCategory));
 }
