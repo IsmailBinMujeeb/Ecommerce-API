@@ -1,14 +1,13 @@
-import nodemailer from 'nodemailer';
-import Mailgen from 'mailgen';
+import nodemailer from "nodemailer";
+import Mailgen from "mailgen";
 
 export const sendEmail = async (to, subject, text) => {
     try {
-
         const mailGenerator = new Mailgen({
-            theme: 'default',
+            theme: "default",
             product: {
-                name: 'GoShop',
-                link: process.env.APP_URL || 'http://localhost:3000',
+                name: "GoShop",
+                link: process.env.APP_URL || "http://localhost:3000",
             },
         });
 
@@ -35,10 +34,10 @@ export const sendEmail = async (to, subject, text) => {
 
         await transporter.sendMail(mailOptions);
     } catch (error) {
-        console.error('Error sending email:', error);
-        throw new Error('Email sending failed');
+        console.error("Error sending email:", error);
+        throw new Error("Email sending failed");
     }
-}
+};
 
 export const emailVerificationMailgenContent = (username, verificationUrl) => {
     return {
@@ -46,16 +45,14 @@ export const emailVerificationMailgenContent = (username, verificationUrl) => {
             name: username,
             intro: "Welcome to GoShop! We're very excited to have you on our site.",
             action: {
-                instructions:
-                    "Verify your email address to start using GoShop",
+                instructions: "Verify your email address to start using GoShop",
                 button: {
                     color: "#22BC66", // Optional action button color
                     text: "Verify your email",
                     link: verificationUrl,
                 },
             },
-            outro:
-                "Need help, or have questions? Just reply to this email, we'd love to help.",
+            outro: "Need help, or have questions? Just reply to this email, we'd love to help.",
         },
     };
 };

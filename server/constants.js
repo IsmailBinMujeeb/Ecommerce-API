@@ -23,6 +23,8 @@ export const MODERATOR_PERMISSIONS = {
     can_promote_user: "can_promote_user",
 };
 
-export const AVAILABLE_MODERATOR_PERMISSIONS = Object.values(MODERATOR_PERMISSIONS);
+export const AVAILABLE_MODERATOR_PERMISSIONS = Object.values(
+    MODERATOR_PERMISSIONS,
+);
 
 export const VALID_PAYMENT_METHODS = Object.values(PaymentMethod);

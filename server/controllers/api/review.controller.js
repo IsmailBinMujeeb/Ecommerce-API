@@ -4,7 +4,6 @@ import ApiResponse from "../../utils/ApiResponse.utils.js";
 import redis from "../../config/redis.config.js";
 
 export const CreateReviewController = async (req, res) => {
-
     const user = req.user;
     const { productId, comment, rating } = req.body;
 
@@ -12,9 +11,9 @@ export const CreateReviewController = async (req, res) => {
         where: {
             AND: {
                 id: productId,
-                isDeleted: false
-            }
-        }
+                isDeleted: false,
+            },
+        },
     });
 
     if (!isProductExist) throw new ApiError(404, "product not found");
@@ -23,9 +22,9 @@ export const CreateReviewController = async (req, res) => {
         where: {
             userId_productId: {
                 userId: user.id,
-                productId
-            }
-        }
+                productId,
+            },
+        },
     });
 
     if (isReviewExist) throw new ApiError(409, "review already exist");
@@ -35,30 +34,30 @@ export const CreateReviewController = async (req, res) => {
             userId: user.id,
             rating,
             comment,
-            productId
-        }
+            productId,
+        },
     });
 
     if (!newReveiw) throw new ApiError(500, "review creation failed");
 
     await redis.del(`reviews:${productId}`);
-    await redis.setex(`reviews:${productId}`, 300, JSON.stringify(newReveiw))
+    await redis.setex(`reviews:${productId}`, 300, JSON.stringify(newReveiw));
 
-    return res.status(201).json(new ApiResponse(201, "review created successfully", newReveiw));
-
-}
+    return res
+        .status(201)
+        .json(new ApiResponse(201, "review created successfully", newReveiw));
+};
 
 export const FetchAllReviewsForAProductController = async (req, res) => {
-
     const { id } = req.params;
 
     const isProductExist = await prisma.product.findFirst({
         where: {
             AND: {
                 id,
-                isDeleted: false
-            }
-        }
+                isDeleted: false,
+            },
+        },
     });
 
     if (!isProductExist) throw new ApiError(404, "product not found");
@@ -66,8 +65,12 @@ export const FetchAllReviewsForAProductController = async (req, res) => {
     const reviews = await prisma.review.findMany({
         where: {
             productId: id,
-        }
+        },
     });
 
-    return res.status(200).json(new ApiResponse(200, "Fetched all reviews successfully", reviews));
-}
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, "Fetched all reviews successfully", reviews),
+        );
+};

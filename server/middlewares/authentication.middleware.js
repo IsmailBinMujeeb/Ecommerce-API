@@ -5,17 +5,20 @@ import AsyncHandler from "../utils/AsyncHandler.utils.js";
 import redis from "../config/redis.config.js";
 
 export default AsyncHandler(async (req, res, next) => {
-
     const incomming_access_token = req.cookies.access_token;
 
-    if (!incomming_access_token) throw new ApiError(400, "missing access token");
+    if (!incomming_access_token)
+        throw new ApiError(400, "missing access token");
 
-    const decoded = jwt.verify(incomming_access_token, process.env.JWT_ACCESS_SECRET, (err, result) => {
+    const decoded = jwt.verify(
+        incomming_access_token,
+        process.env.JWT_ACCESS_SECRET,
+        (err, result) => {
+            if (err) throw new ApiError(401, "Invalid access token");
 
-        if (err) throw new ApiError(401, "Invalid access token");
-
-        return result;
-    });
+            return result;
+        },
+    );
 
     if (!decoded) throw new ApiError(401, "Invalid access token");
 
@@ -24,7 +27,7 @@ export default AsyncHandler(async (req, res, next) => {
 
     const user = await prisma.user.findFirst({
         where: {
-            id: decoded.userId
+            id: decoded.userId,
         },
         select: {
             id: true,
@@ -32,7 +35,7 @@ export default AsyncHandler(async (req, res, next) => {
             username: true,
             display_name: true,
             role: true,
-            permissions: true
+            permissions: true,
         },
     });
 
@@ -40,4 +43,4 @@ export default AsyncHandler(async (req, res, next) => {
 
     req.user = user;
     next();
-})
+});

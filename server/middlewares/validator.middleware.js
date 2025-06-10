@@ -3,7 +3,6 @@ import ApiError from "../utils/ApiError.utils.js";
 import AsyncHandler from "../utils/AsyncHandler.utils.js";
 
 export default AsyncHandler(async (req, res, next) => {
-
     const errors = validationResult(req);
 
     if (errors.isEmpty()) return next();
