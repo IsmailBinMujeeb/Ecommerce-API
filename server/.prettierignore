@@ -1,0 +1,20 @@
+# Dependencies
+node_modules
+package*
+
+# Prettier
+.prettierrc
+
+# env
+.env
+.sample.env
+
+# Special Files
+README.md
+LICENSE
+
+# logs
+logs
+
+# Git
+.gitignore
