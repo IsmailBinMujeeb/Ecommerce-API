@@ -17,7 +17,7 @@ const router = Router();
 /**
  * @swagger
  * tags:
- *   name: Reviews
+ *   name: Review
  *   description: APIs to manage product reviews
  */
 
