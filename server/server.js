@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import swaggerUI from "swagger-ui-express";
+import swagger from "./config/swagger.config.js";
 import { config } from "dotenv";
 
 config();
@@ -31,5 +33,7 @@ app.use("/api/category", categoryRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/review", reviewRouter);
 app.use("/api/permission", permissionsRouter);
+
+app.use("/api/docs", swaggerUI.serve, swaggerUI.setup(swagger, { customSiteTitle: "GoShop APIs", }))
 
 export default app;
