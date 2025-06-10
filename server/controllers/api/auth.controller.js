@@ -9,6 +9,7 @@ import {
 import { generateTemporaryTokens } from "../../utils/helper.utils.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import env from "../../config/env.js";
 
 export const UserRegisterController = async (req, res) => {
     const { username, email, password, display_name } = req.body;
@@ -40,19 +41,19 @@ export const UserRegisterController = async (req, res) => {
         "Welcome to GoShop",
         emailVerificationMailgenContent(
             newUser.username,
-            `${process.env.CLIENT_BASE_URL}/api/user/verify-email/${unhashedToken}`,
+            `${env.CLIENT_BASE_URL}/api/user/verify-email/${unhashedToken}`,
         ),
     );
 
     const accessToken = jwt.sign(
         { userId: newUser.id },
-        process.env.JWT_ACCESS_SECRET,
-        { expiresIn: process.env.ACCESS_TOKEN_EXPIRY },
+        env.JWT_ACCESS_SECRET,
+        { expiresIn: env.ACCESS_TOKEN_EXPIRY },
     );
     const refreshToken = jwt.sign(
         { userId: newUser.id },
-        process.env.JWT_REFRESH_SECRET,
-        { expiresIn: process.env.REFRESH_TOKEN_EXPIRY },
+        env.JWT_REFRESH_SECRET,
+        { expiresIn: env.REFRESH_TOKEN_EXPIRY },
     );
 
     await prisma.user.update({
@@ -74,13 +75,13 @@ export const UserRegisterController = async (req, res) => {
 
     res.cookie("access_token", accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: env.NODE_ENV === "production",
         maxAge: 1000 * 60 * 15, // 15 minutes
     });
 
     res.cookie("refresh_token", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: env.NODE_ENV === "production",
         maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
     });
 
@@ -108,13 +109,13 @@ export const UserLoginController = async (req, res) => {
 
     const accessToken = jwt.sign(
         { userId: user.id },
-        process.env.JWT_ACCESS_SECRET,
-        { expiresIn: process.env.ACCESS_TOKEN_EXPIRY },
+        env.JWT_ACCESS_SECRET,
+        { expiresIn: env.ACCESS_TOKEN_EXPIRY },
     );
     const refreshToken = jwt.sign(
         { userId: user.id },
-        process.env.JWT_REFRESH_SECRET,
-        { expiresIn: process.env.REFRESH_TOKEN_EXPIRY },
+        env.JWT_REFRESH_SECRET,
+        { expiresIn: env.REFRESH_TOKEN_EXPIRY },
     );
 
     await prisma.user.update({
@@ -128,12 +129,12 @@ export const UserLoginController = async (req, res) => {
 
     res.cookie("access_token", accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: env.NODE_ENV === "production",
         maxAge: 1000 * 60 * 15, // 15 minutes
     });
     res.cookie("refresh_token", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: env.NODE_ENV === "production",
         maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
     });
 
@@ -149,7 +150,7 @@ export const UserLogoutController = async (req, res) => {
 
     const access_token = jwt.verify(
         incommingAccessToken,
-        process.env.JWT_ACCESS_SECRET,
+        env.JWT_ACCESS_SECRET,
         (err, decoded) => {
             if (err) {
                 throw new ApiError(401, "invalid access token");
@@ -229,7 +230,7 @@ export const refreshAccessToken = async (req, res) => {
 
     const decoded = jwt.verify(
         incomming_refresh_token,
-        process.env.JWT_REFRESH_SECRET,
+        env.JWT_REFRESH_SECRET,
         (err, result) => {
             if (err) throw new ApiError(401, "refresh token expired or used");
             return result;
@@ -253,13 +254,13 @@ export const refreshAccessToken = async (req, res) => {
 
     const accessToken = jwt.sign(
         { userId: user.id },
-        process.env.JWT_ACCESS_SECRET,
-        { expiresIn: process.env.ACCESS_TOKEN_EXPIRY },
+        env.JWT_ACCESS_SECRET,
+        { expiresIn: env.ACCESS_TOKEN_EXPIRY },
     );
     const refreshToken = jwt.sign(
         { userId: user.id },
-        process.env.JWT_REFRESH_SECRET,
-        { expiresIn: process.env.REFRESH_TOKEN_EXPIRY },
+        env.JWT_REFRESH_SECRET,
+        { expiresIn: env.REFRESH_TOKEN_EXPIRY },
     );
 
     await prisma.user.update({
@@ -273,12 +274,12 @@ export const refreshAccessToken = async (req, res) => {
 
     res.cookie("access_token", accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: env.NODE_ENV === "production",
         maxAge: 1000 * 60 * 15, // 15 minutes
     });
     res.cookie("refresh_token", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: env.NODE_ENV === "production",
         maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
     });
 

@@ -3,9 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import swaggerUI from "swagger-ui-express";
 import swagger from "./config/swagger.config.js";
-import { config } from "dotenv";
-
-config();
+import env from "./config/env.js";
 
 import authRouter from "./routes/api/auth.route.js";
 import userRouter from "./routes/api/user.route.js";
@@ -17,7 +15,7 @@ import reviewRouter from "./routes/api/review.route.js";
 import permissionsRouter from "./routes/api/permission.route.js";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT || 3000;
 
 app.set("port", PORT);
 app.use(express.json());

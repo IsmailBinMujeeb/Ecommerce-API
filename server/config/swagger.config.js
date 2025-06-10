@@ -1,4 +1,5 @@
 import swagger from "swagger-jsdoc";
+import env from "./env.js";
 
 export default swagger({
     apis: ["./routes/api/*.js"], swaggerDefinition: {
@@ -10,7 +11,7 @@ export default swagger({
         },
         servers: [
             {
-                url: process.env.SERVER_BASE_URL,
+                url: env.SERVER_BASE_URL,
             },
         ],
     }

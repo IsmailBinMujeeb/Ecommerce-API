@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import prisma from "../config/prisma.config.js";
 import AsyncHandler from "../utils/AsyncHandler.utils.js";
 import redis from "../config/redis.config.js";
+import env from "../config/env.js";
 
 export default AsyncHandler(async (req, res, next) => {
     const incomming_access_token = req.cookies.access_token;
@@ -12,7 +13,7 @@ export default AsyncHandler(async (req, res, next) => {
 
     const decoded = jwt.verify(
         incomming_access_token,
-        process.env.JWT_ACCESS_SECRET,
+        env.JWT_ACCESS_SECRET,
         (err, result) => {
             if (err) throw new ApiError(401, "Invalid access token");
 

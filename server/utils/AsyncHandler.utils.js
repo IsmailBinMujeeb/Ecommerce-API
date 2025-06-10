@@ -1,10 +1,11 @@
 import ApiResponse from "./ApiResponse.utils.js";
+import env from "../config/env.js";
 
 export default (fn) => async (req, res, next) => {
     try {
         await fn(req, res, next);
     } catch (error) {
-        if (process.env.NODE_ENV !== "production") console.error(error);
+        if (env.NODE_ENV !== "production") console.error(error);
         return res
             .status(error.statusCode || 500)
             .json(

@@ -7,7 +7,7 @@ export const sendEmail = async (to, subject, text) => {
             theme: "default",
             product: {
                 name: "GoShop",
-                link: process.env.APP_URL || "http://localhost:3000",
+                link: env.APP_URL || "http://localhost:3000",
             },
         });
 
@@ -15,12 +15,12 @@ export const sendEmail = async (to, subject, text) => {
         const emailHtml = mailGenerator.generate(text);
 
         const transporter = nodemailer.createTransport({
-            host: process.env.MAILTRAP_SMTP_HOST,
-            port: process.env.MAILTRAP_SMTP_PORT,
+            host: env.MAILTRAP_SMTP_HOST,
+            port: env.MAILTRAP_SMTP_PORT,
             secure: false,
             auth: {
-                user: process.env.MAILTRAP_SMTP_USER,
-                pass: process.env.MAILTRAP_SMTP_PASS,
+                user: env.MAILTRAP_SMTP_USER,
+                pass: env.MAILTRAP_SMTP_PASS,
             },
         });
 
