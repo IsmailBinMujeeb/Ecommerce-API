@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import Mailgen from "mailgen";
+import env from "../config/env.js";
 
 export const sendEmail = async (to, subject, text) => {
     try {
