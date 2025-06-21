@@ -59,9 +59,30 @@ A RESTful API for an e-commerce application, built with Node.js and Express. Thi
     - Create a .env file in the root of the server directory.
     - Add the following variables:
         ```env
-        PORT=5000
-        MONGODB_URI=your_mongodb_connection_string
-        JWT_SECRET=your_jwt_secret
+        PORT=3000
+        CLIENT_BASE_URL=
+        SERVER_BASE_URL=
+
+        JWT_ACCESS_SECRET=
+        JWT_REFRESH_SECRET=
+        ACCESS_TOKEN_EXPIRY=
+        REFRESH_TOKEN_EXPIRY=
+
+        MAILTRAP_SMTP_HOST=
+        MAILTRAP_SMTP_USER=
+        MAILTRAP_SMTP_PASS=
+        MAILTRAP_SMTP_PORT=
+
+        ADMIN_USERNAME=
+        ADMIN_PASSWORD=
+        ADMIN_DISPLAY_NAME=
+        ADMIN_EMAIL=
+
+        REDIS_URI=
+
+        NODE_ENV=
+
+        DATABASE_URL=
         ```
 
 4. Start the development server:
