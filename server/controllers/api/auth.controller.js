@@ -2,10 +2,7 @@ import prisma from "../../config/prisma.config.js";
 import ApiError from "../../utils/ApiError.utils.js";
 import bcrypt from "bcrypt";
 import ApiResponse from "../../utils/ApiResponse.utils.js";
-import {
-    sendEmail,
-    emailVerificationMailgenContent,
-} from "../../utils/Mail.utils.js";
+import emailVerificationQueue from "../../queue/email.verification.queue.js";
 import { generateTemporaryTokens } from "../../utils/helper.utils.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -36,14 +33,7 @@ export const UserRegisterController = async (req, res) => {
     const { unhashedToken, hashedToken, tokenExpiry } =
         generateTemporaryTokens();
 
-    sendEmail(
-        newUser.email,
-        "Welcome to GoShop",
-        emailVerificationMailgenContent(
-            newUser.username,
-            `${env.CLIENT_BASE_URL}/api/user/verify-email/${unhashedToken}`,
-        ),
-    );
+    await emailVerificationQueue.add("email-verification-queue", { email, username, unhashedToken })
 
     const accessToken = jwt.sign(
         { userId: newUser.id },
